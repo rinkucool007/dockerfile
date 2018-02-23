@@ -1,0 +1,8 @@
+Running a Private Docker Registry Container:
+https://www.youtube.com/watch?v=S9kfP2WYV_I
+
+Hyper-V ON and OFF
+bcdedit /set hypervisorlaunchtype off
+
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V –All
+Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
