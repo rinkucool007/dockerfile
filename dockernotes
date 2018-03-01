@@ -6,3 +6,7 @@ bcdedit /set hypervisorlaunchtype off
 
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V –All
 Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+
+http://www.poweronplatforms.com/enable-disable-hyper-v-windows-10-8/
+https://blogs.msdn.microsoft.com/jcorioland/2016/05/31/create-and-run-hyper-v-containers-using-docker-on-windows-10-desktop/
+
