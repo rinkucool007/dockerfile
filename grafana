@@ -104,9 +104,9 @@ volumes:
 docker network create grafana_data
 docker network create influxdb_data 
   
-docker run -v influxdb_data:/var/lib/influxdb --name influxdb -p 8086:8086 -e INFLUXDB_DB=influx -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=admin influxdb:1.8-alpine   
-docker run -v ./telegraf.conf:/etc/telegraf/telegraf.conf:ro --name telegraf --link influxdb -p 8125:8125 telegraf
-docker run -v grafana_data:/var/lib/grafana --name grafana-server --link influxdb -p 3000:3000 -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin -e GF_INSTALL_PLUGINS= grafana/grafana 
+docker run -d --restart=unless-stopped -v influxdb_data:/var/lib/influxdb --name influxdb -p 8086:8086 -e INFLUXDB_DB=influx -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=admin influxdb:1.8-alpine   
+docker run -d --restart=unless-stopped -v ./telegraf.conf:/etc/telegraf/telegraf.conf:ro --name telegraf --link influxdb -p 8125:8125 telegraf
+docker run -d --restart=unless-stopped -v grafana_data:/var/lib/grafana --name grafana-server --link influxdb -p 3000:3000 -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin -e GF_INSTALL_PLUGINS= grafana/grafana 
 
   
   
