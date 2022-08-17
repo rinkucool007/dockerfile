@@ -1,0 +1,112 @@
+## docker-compose.yml
+
+version: '3.6'
+services:
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    volumes:
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+    - '8125:8125'
+
+  influxdb:
+    image: influxdb:1.8-alpine
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: always
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      
+volumes:
+  grafana_data: {}
+  influxdb_data: {}
+
+
+
+------------------------------------------
+##telegraf.conf
+
+ [global_tags]
+
+[agent]
+  interval = "60s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  collection_jitter = "0s"
+  flush_interval = "10s"
+  flush_jitter = "0s"
+  precision = ""
+  hostname = "192.xxx.0.xxx"
+  omit_hostname = false
+
+[[outputs.influxdb]]
+  urls = ["http://influxdb:8086"]
+  database = "influx"
+  timeout = "5s"
+  username = "telegraf"
+  password = "metricsmetricsmetricsmetrics"
+
+
+[[inputs.cpu]]
+  percpu = true
+  totalcpu = true
+  collect_cpu_time = false
+  report_active = false
+
+
+[[inputs.disk]]
+  ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+
+
+[[inputs.diskio]]
+
+[[inputs.kernel]]
+
+[[inputs.mem]]
+
+[[inputs.processes]]
+
+[[inputs.swap]]
+
+[[inputs.system]]
+
+---------------------------------------------------
+
+docker network create grafana_data
+docker network create influxdb_data 
+  
+docker run -v influxdb_data:/var/lib/influxdb --name influxdb -p 8086:8086 -e INFLUXDB_DB=influx -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=admin influxdb:1.8-alpine   
+docker run -v ./telegraf.conf:/etc/telegraf/telegraf.conf:ro --name telegraf --link influxdb -p 8125:8125 telegraf
+docker run -v grafana_data:/var/lib/grafana --name grafana-server --link influxdb -p 3000:3000 -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin -e GF_INSTALL_PLUGINS= grafana/grafana 
+
+  
+  
